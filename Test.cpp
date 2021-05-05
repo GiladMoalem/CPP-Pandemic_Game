@@ -21,6 +21,9 @@ using namespace pandemic;
 
 #define CITYS 48
 
+
+/*___________________________________________________________________________________________________*/
+
 TEST_CASE("init board test - get & set city's disease cubes"){
     Board board;
 
@@ -60,7 +63,9 @@ TEST_CASE("init board test - get & set city's disease cubes"){
         
     }
 }
+/*___________________________________________________________________________________________________*/
 
+// basic drive funcion
 TEST_CASE("board conection test - check if player can drive to connected city"){
     Board board;
 	OperationsExpert player {board, City::Atlanta};  // initialize an "operations expert" player on the given board, in Atlanta.
@@ -91,6 +96,7 @@ TEST_CASE("board conection test - check if player can drive to connected city"){
         }
     }
 }
+/*___________________________________________________________________________________________________*/
 
 TEST_CASE("board conection test - check complicated connection"){
     Board board;
@@ -108,4 +114,92 @@ TEST_CASE("board conection test - check complicated connection"){
     CHECK_NOTHROW(med.drive(City::SanFrancisco));
     CHECK_NOTHROW(med.drive(City::LosAngeles));
     CHECK_NOTHROW(med.drive(City::Sydney));
+}
+
+/*___________________________________________________________________________________________________*/
+
+// basic fly direct 
+TEST_CASE("fly direct function"){
+    Board board;
+    OperationsExpert player{board,City::Atlanta};
+    
+    for (size_t i = 0; i < CITYS; i++){
+        CHECK_THROWS(player.fly_direct(City(i)));
+    }
+    CHECK_NOTHROW(
+    player.take_card(City::Cairo)
+          .take_card(City::Lima)
+          .take_card(City::Moscow);
+    );
+
+    for (size_t i = 0; i < CITYS; i++){
+        if( i==City::Cairo || i==City::Lima || i==City::Moscow ){
+            CHECK_NOTHROW(player.fly_direct(City(i)));
+        }else{
+            CHECK_THROWS(player.fly_direct(City(i)));
+        }
+    }
+// need check what apand if player fly_direct to the city he been?
+    CHECK_THROWS(player.fly_direct(City::Moscow));
+    CHECK_THROWS(player.fly_direct(City::Lima));
+    CHECK_THROWS(player.fly_direct(City::Cairo));
+
+    CHECK_THROWS(player.fly_direct(City::Atlanta));
+}
+/*___________________________________________________________________________________________________*/
+
+TEST_CASE("fly direct function with Dispatcher"){
+    Board board;
+    Dispatcher dis_player{board,City::Atlanta};
+    
+    for (size_t i = 0; i < CITYS; i++){
+        CHECK_THROWS(dis_player.fly_direct(City(i)));
+    }
+
+    CHECK_NOTHROW( 
+        dis_player.take_card(City::Beijing)
+                  .take_card(City::Chicago)
+    );
+
+    for (size_t i = 0; i < CITYS; i++){
+        if(i==City::Chicago||i==City::Beijing){
+            CHECK_NOTHROW(dis_player.fly_direct(City(i)));
+        }else{
+            CHECK_THROWS(dis_player.fly_direct(City(i)));
+        }
+    }
+}
+/*___________________________________________________________________________________________________*/
+TEST_CASE("fly direct function with Dispatcher & OperationsExpert - dis' can fly direct after expert' build a station"){
+    Board board;
+    Dispatcher dis_player{board, City::Atlanta};
+    OperationsExpert expert_player{board,City::Washington};
+    
+    CHECK_NOTHROW(expert_player.build());
+    
+    for (size_t i = 0; i < CITYS; i++){
+        CHECK_THROWS(dis_player.fly_direct(City(i)));
+    }
+
+    CHECK_NOTHROW( dis_player.drive(City::Washington));
+    
+    srand(time(NULL)); //for the rand func
+    CHECK_NOTHROW( dis_player.fly_direct(City(rand()%CITYS)));//what apand if he fly direct to woshington?
+}
+/*___________________________________________________________________________________________________*/
+
+TEST_CASE("fly direct function with Dispatcher & OperationsExpert - dis' can fly direct after expert' build a station - RANDOM - "){
+    Board board;
+    OperationsExpert expert_player{board, City::Washington};
+    CHECK_NOTHROW (expert_player.build());
+    srand(time(NULL)); //for the rand func
+
+    for (size_t i = 0; i < 100; i++){
+        Dispatcher dis_player_temp{board,City::Washington};
+        int city = City::Washington;
+        while(city == City::Washington) { city = rand()%CITYS;  }
+        
+        CHECK_NOTHROW (dis_player_temp.fly_direct(City(city)));
+        CHECK_THROWS (dis_player_temp.fly_direct(City::Washington));
+    }
 }
