@@ -3,8 +3,12 @@
 #include "Board.hpp"
 #include "City.hpp"
 
+namespace pandemic{
+
 class OperationsExpert: public Player{
     public:
-        OperationsExpert(pandemic::Board board, City city): Player(board,city){}
-        Player& build();
+        OperationsExpert(pandemic::Board& board, City city): Player(board,city,"OperationsExpert"){}
+        Player& build()override;
 };
+
+}

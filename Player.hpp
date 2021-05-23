@@ -5,40 +5,45 @@
 #include "Color.hpp"
 using namespace std;
 
+namespace pandemic{
+
 class Player{
 public:
-Player(pandemic::Board board, City city){
-    this->board = board;
-    this->city = city;
-}
+    Player(Board& board, City city, string role="player"):board(board) ,city(city),_role(role) {}
 
 protected:
-pandemic::Board board;
+Board& board;
 City city;
+std::string _role;
+set<City> cards;
 
 public:
 // 1 drive
-    Player& drive(City city);
+    virtual Player& drive(City city);
     
 // 2 fly direct
-    Player& fly_direct(City city);
+    virtual Player& fly_direct(City city);
 
 // 3 fly charter
-    Player& fly_charter(City city);
+    virtual Player& fly_charter(City city);
 
 // 4 fly shuttle
-    Player& fly_shuttle(City city);
+    virtual Player& fly_shuttle(City city);
 
 // 5 build
-    Player& build();
+    virtual Player& build();
 
 // 6 discover cure
-    Player& discover_cure(Color color);
+    virtual Player& discover_cure(Color color);
 
 // 7 treat
-    Player& treat(City city);
+    virtual Player& treat(City city);
 
 // general functions
     Player& take_card(City city);
-    string role();
+    std::string role()const;
+
+    friend std::ostream& operator<<(std::ostream& os,const Player& p);
 };
+
+}

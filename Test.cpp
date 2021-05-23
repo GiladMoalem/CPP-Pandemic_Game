@@ -214,7 +214,7 @@ TEST_CASE("fly charter function - uses card for fly"){
         CHECK_THROWS(player.fly_charter(City(i)));
     }
 
-    player.take_card(City::Delhi);
+    player.take_card(City::Atlanta);
     CHECK_NOTHROW(player.fly_charter(City::Delhi));
     CHECK_NOTHROW(player.drive(City::Tehran));
     // used the card Delhi
@@ -233,15 +233,15 @@ TEST_CASE("fly shuttle function - before & after build stations"){
     
     CHECK_NOTHROW(ex_player1.build());
     for (size_t i = 0; i < CITYS; i++){
-        CHECK_THROWS(scient_player.fly_shuttle(City(i)));
+        if(i!=City::Atlanta)    CHECK_THROWS(scient_player.fly_shuttle(City(i)));
     }
 
     CHECK_NOTHROW(ex_player2.build());
 
     //now the player can fly shuttle between Atlanta and Bogota how many time he wants.
-    CHECK_THROWS(scient_player.fly_shuttle(City::Bogota));
-    CHECK_THROWS(scient_player.fly_shuttle(City::Atlanta));
-    CHECK_THROWS(scient_player.fly_shuttle(City::Bogota));
+    CHECK_NOTHROW(scient_player.fly_shuttle(City::Bogota));
+    CHECK_NOTHROW(scient_player.fly_shuttle(City::Atlanta));
+    CHECK_NOTHROW(scient_player.fly_shuttle(City::Bogota));
 }
 
 /*___________________________________________________________________________________________________*/
@@ -390,7 +390,7 @@ TEST_CASE("discover_cure function - Scientist"){
     CHECK_THROWS(scient.fly_direct(City::Shanghai));//make sure the card droped.
 
     Scientist scient2{board, City::Atlanta, 1};
-    CHECK_THROWS(scient2.discover_cure(Color::Red));
+    CHECK_THROWS(scient2.discover_cure(Color::Black));
     scient2.take_card(City::SanFrancisco)
             .take_card(City::Washington)
             .take_card(City::Atlanta);
